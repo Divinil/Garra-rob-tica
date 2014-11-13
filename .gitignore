@@ -1,0 +1,106 @@
+#include <Servo.h> //Biblioteca utilizada
+
+
+byte seven_seg_digits[10][7] = { 
+  { 
+    1,1,1,1,1,1,0       }
+  , // = 0
+  { 
+    0,1,1,0,0,0,0       }
+  , // = 1
+  { 
+    1,1,0,1,1,0,1       }
+  , // = 2
+  { 
+    1,1,1,1,0,0,1       }
+  , // = 3
+  { 
+    0,1,1,0,0,1,1       }
+  , // = 4
+  { 
+    1,0,1,1,0,1,1       }
+  , // = 5
+  { 
+    1,0,1,1,1,1,1       }
+  , // = 6
+  { 
+    1,1,1,0,0,0,0       }
+  , // = 7
+  { 
+    1,1,1,1,1,1,1       }
+  , // = 8
+  { 
+    1,1,1,0,0,1,1       } // = 9
+};
+
+
+void writeDot(byte dot) {
+  digitalWrite(9, dot);
+}
+
+void sevenSegWrite(byte digit) {
+  byte pin = 2;
+  for (byte segCount = 0; segCount < 7; ++segCount) {
+    digitalWrite(pin, seven_seg_digits[digit][segCount]);
+    ++pin;
+  }
+}
+
+
+#define SERVO  10//Porta utilizada para o motor
+#define SERVO2 11//Porta utilizada para o motor
+int led = 13;
+int sensorValue = 0;        // value read from the pot
+//Explicação sobre bibliotecas e include na legenda do código
+
+Servo s,s2; //Variável utilizada para o servo motor
+int pos,pos2; //Posição para deixar o motor
+
+void setup ()
+{
+
+  s.attach(SERVO);
+  s2.attach(SERVO2);
+  Serial.begin(9600);
+  pinMode(led, OUTPUT);
+  s.write(75); //Começa o motor na posição 0
+  s2.write(90);
+  
+  pinMode(2, OUTPUT); 
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  writeDot(0); // start with the "dot" off
+
+}
+int contador=0;
+void loop()
+{
+
+
+  sensorValue = analogRead(A0);
+  Serial.println(sensorValue);
+  if(sensorValue <=400 ){ //ligar um fio no positivo 
+
+
+    digitalWrite(led, HIGH);//led da base
+    s.write(55); //abre a garra
+    delay(1250);
+    s2.write(170); //vira lado 1
+    delay(1250);
+    s.write(60);//fecha garra
+    delay(1250);
+    s2.write(25); // vira lado 2
+    delay(1250);
+    
+    sevenSegWrite(contador);
+    contador+=1;
+    contador=contador%9;
+    
+  }
+
+}
